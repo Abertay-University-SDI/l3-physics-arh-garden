@@ -16,7 +16,7 @@ public:
 	void handleInput(float dt) override;
 	void update(float dt) override;
 
-	void checkWallBounce(const sf::Shape& collider);
+	void checkWallBounce(const sf::Vector2f bgSize);
 
 private:
 	const float MAX_SPEED = 150.f;

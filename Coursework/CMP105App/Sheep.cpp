@@ -32,6 +32,10 @@ Sheep::Sheep()
 
 	m_currentAnimation = &m_walkDown;
 	setTextureRect(m_currentAnimation->getCurrentFrame());
+
+	// initialise collision shape
+	m_collisionBox.size = { 36, 52 };
+	m_collisionBox.position = { 14, 6 };
 }
 
 Sheep::~Sheep()
@@ -61,6 +65,11 @@ void Sheep::update(float dt)
 	m_velocity -= m_velocity * DRAG_FACTOR * dt;
 	m_velocity += m_acceleration * dt;
 
+	checkWallBounce({ 1024,1024 });
+
+	std::cout << "pos: { " + std::to_string(getPosition().x) + "," + std::to_string(getPosition().y) + " }\n";
+	//std::cout << "collision rect: { { " + std::to_string(getCollisionBox().size.x) + "," + std::to_string(getCollisionBox().size.y)
+	//	+ "} , { " + std::to_string(getCollisionBox().position.x) + "," + std::to_string(getCollisionBox().position.y) + "}\n";
 
 	m_velocity.x = std::clamp(m_velocity.x, -MAX_SPEED, MAX_SPEED);
 	m_velocity.y = std::clamp(m_velocity.y, -MAX_SPEED, MAX_SPEED);
@@ -69,7 +78,25 @@ void Sheep::update(float dt)
 }
 
 
-void Sheep::checkWallBounce(const sf::Shape& collider)
+void Sheep::checkWallBounce(const sf::Vector2f bgSize)
 {
+	sf::Vector2f bodyMin = -getCollisionBox().size / 2.f;
+	sf::Vector2f bodyMax = getCollisionBox().size / 2.f;
+	sf::Vector2f bgMin = { 0,0 };
+	sf::Vector2f bgMax = bgSize - getSize();
 
+	// x
+	if (getPosition().x <= 0 || getPosition().x >= bgMax.x) {
+		m_velocity.x = -m_velocity.x;
+
+		float target = std::clamp(getPosition().x, bodyMin.x, bgMax.x);
+		setPosition({ target,getPosition().y });
+	}
+	// y
+	if (getPosition().y <= 0 || getPosition().y >= bgMax.y) {
+		m_velocity.y = -m_velocity.y;
+
+		float target = std::clamp(getPosition().y, bodyMin.y, bgMax.y);
+		setPosition({ getPosition().x,target });
+	}
 }

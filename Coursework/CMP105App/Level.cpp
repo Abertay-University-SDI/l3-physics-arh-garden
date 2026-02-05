@@ -9,6 +9,7 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 		std::cerr << "Yikes, no field\n";
 	m_background.setTexture(&m_backgroundTexture);
 	m_background.setSize({ background_size, background_size});
+	m_background.setPosition({ 0,0 });
 
 	// Setup Sheep.
 	if (!m_sheepTexture.loadFromFile("gfx/sheep_sheet.png"))
@@ -78,6 +79,9 @@ void Level::render()
 	m_window.draw(m_background);
 	for (auto pig : m_pigPointers) m_window.draw(*pig);
 	m_window.draw(m_sheep);
+	sf::RectangleShape collider = sf::RectangleShape(m_sheep.getCollisionBox().size);
+	collider.setPosition(m_sheep.getCollisionBox().position);
+	m_window.draw(collider);
 	endDraw();
 }
 
